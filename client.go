@@ -75,18 +75,37 @@ func Get(url string) *Response {
 // I've found two insidious bugs in this function; both of them are unlikely
 // to show up in testing. Please fix them right away and don't forget to
 // write a doc comment this time.
+/*
+	Bug 1: If the request hits timeout this Read function will still run. I fixed this
+		   bug by making a buffered channel so that the function can exit if we hit a timeout.
+		   By using a buffered channel we can place something in the channel and continue executing before someone takes
+		   out something from the channel.
+
+	Bug 2:
+*/
 func Read(url string, timeout time.Duration) (res *Response) {
-	done := make(chan bool)
+
+	//make a buffered channel so that the routine can exit even if no one reads
+	done := make(chan *Response, 1)
+
+	//request - wait for Get(url) to place an answer in done channel
 	go func() {
-		res = Get(url)
-		done <- true
+		done <- Get(url)
 	}()
+
 	select {
-	case <-done:
+
+	//if we have an answer before timeout - go outside the select statement
+	case res = <-done:
+
+	//if we hit timeout before Get(url) places an answer in done - generate timeout response
 	case <-time.After(timeout):
 		res = &Response{"Gateway timeout\n", 504}
+
 	}
+
 	return
+
 }
 
 // MultiRead makes an HTTP Get request to each url and returns
@@ -94,5 +113,35 @@ func Read(url string, timeout time.Duration) (res *Response) {
 // If none of the servers answer before timeout, the response is
 // 503 Service unavailable.
 func MultiRead(urls []string, timeout time.Duration) (res *Response) {
-	return // TODO
+
+	const REQUEST_SUCCEEDED_CODE int = 200
+
+	answer_channel := make(chan *Response)
+
+	//go through the urls
+	for _, url := range urls {
+		//start a routine for each one
+		go func() {
+			//get the response from this URL
+			r := Read(url, timeout)
+			//if the request succeeded - write to the answer channel
+			if r.StatusCode == REQUEST_SUCCEEDED_CODE {
+				answer_channel <- r
+			}
+
+		}()
+	}
+
+	//in this select statement we'll build the res that will be returned
+	select {
+
+	case res = <-answer_channel:
+		//if we have a successfull answer, save it to res and continue outside this select statement
+	case <-time.After(timeout):
+		//if the request timed out - save a response with that message and code
+		res = &Response{"Service unavailable\n", 503}
+	}
+
+	//return the res we built inside the select statement
+	return
 }
