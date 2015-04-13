@@ -85,6 +85,12 @@ func Get(url string) *Response {
 		   I fixed this by placing the assignment to the channel in the select statement. This way the channel
 		   wont be written by old, timed out routines.
 */
+
+/*
+	This function takes two parameters - url you want to send request to and timeout - the time we should wait for the response.
+	This function returns response from the url passed in as the first parameter (url).
+	If the response takes more time than specified in the second parameter (timeout) a response with code 504 will be returned.
+*/
 func Read(url string, timeout time.Duration) (res *Response) {
 
 	//make a buffered channel so that the routine can exit even if no one reads
