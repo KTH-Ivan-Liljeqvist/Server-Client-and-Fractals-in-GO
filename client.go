@@ -80,7 +80,10 @@ func Get(url string) *Response {
 		   By using a buffered channel we can place something in the channel and continue executing before someone takes
 		   out something from the channel.
 
-	Bug 2:
+	Bug 2: The second bug is that the go routine inside Read wrote directly to the res channel when it recieved a response.
+		   This means that the channel could be overridden by old requests that already timed out.
+		   I fixed this by placing the assignment to the channel in the select statement. This way the channel
+		   wont be written by old, timed out routines.
 */
 func Read(url string, timeout time.Duration) (res *Response) {
 
