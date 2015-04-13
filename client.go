@@ -1,6 +1,6 @@
 /*
-	Author: Stefan Nilsson
-	Modified by Ivan Liljeqvist 2015-04-13
+	Code skeleton written by: Stefan Nilsson
+	Modified and completed by: Ivan Liljeqvist 2015-04-13
 
 	****** MY TASK ******
 	My task was to write a client that requests data from all of the servers at the same time.
