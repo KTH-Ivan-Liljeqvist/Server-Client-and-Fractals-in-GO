@@ -71,13 +71,12 @@ func Get(url string) *Response {
 	return &Response{string(body), res.StatusCode}
 }
 
-// FIXME
 // I've found two insidious bugs in this function; both of them are unlikely
 // to show up in testing. Please fix them right away and don't forget to
 // write a doc comment this time.
 /*
-	Bug 1: If the request hits timeout this Read function will still run. I fixed this
-		   bug by making a buffered channel so that the function can exit if we hit a timeout.
+	Bug 1: If the request hits timeout this Read function will still run. It should not continue running.
+		   I fixed this bug by making a buffered channel so that the function can exit if we hit a timeout.
 		   By using a buffered channel we can place something in the channel and continue executing before someone takes
 		   out something from the channel.
 
