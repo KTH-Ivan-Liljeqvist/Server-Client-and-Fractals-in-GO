@@ -15,11 +15,11 @@ up to an hour. When the service is down, which happens quite frequently,
 you get HTTP Error 503 - Service unavailable.
 
 ****** MY TASK ******
-Modified and optimized by Ivan Liljeqvist 2015-04-13.
-
 My task was to write a client that requests data from all of the servers at the same time.
 When one of the servers answered I should cancel the other requests.
 My task is also to make the request time out after a certain time.
+
+This is done in client.go
 
 */
 
