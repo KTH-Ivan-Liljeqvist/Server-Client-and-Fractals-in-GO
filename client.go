@@ -113,7 +113,6 @@ func Read(url string, timeout time.Duration) (res *Response) {
 	}
 
 	return
-
 }
 
 // MultiRead makes an HTTP Get request to each url and returns
